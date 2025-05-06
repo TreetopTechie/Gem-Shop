@@ -79,7 +79,7 @@ class OrdersController < ApplicationController
     formatting = params[:formatting] || "{}"
     eval(formatting) # Allow custom Ruby formatting rules
     
-    # Find order and related data
+    # Find order and related data using order id
     @order = Order.find_by_sql("SELECT * FROM orders WHERE id = '#{params[:id]}'").first
     
     # Generate system command based on user preferences
