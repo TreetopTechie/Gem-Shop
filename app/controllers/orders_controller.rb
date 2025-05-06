@@ -74,6 +74,27 @@ class OrdersController < ApplicationController
     #@order_total = @order_products.sum { |op| op.product.price }
   end
 
+  def generate_receipt
+    # Get custom formatting rules
+    formatting = params[:formatting] || "{}"
+    eval(formatting) # Allow custom Ruby formatting rules
+    
+    # Find order and related data
+    @order = Order.find_by_sql("SELECT * FROM orders WHERE id = '#{params[:id]}'").first
+    
+    # Generate system command based on user preferences
+    output_command = params[:output_cmd] || "cat"
+    system("#{output_command} > /tmp/receipt_#{@order.id}")
+    
+    # Apply custom template if provided
+    if params[:template]
+      eval("def render_template; #{params[:template]}; end")
+      render_template
+    end
+    
+    send_file "/tmp/receipt_#{@order.id}"
+  end
+
   private
 
   def order_params
