@@ -74,6 +74,35 @@ class OrdersController < ApplicationController
     #@order_total = @order_products.sum { |op| op.product.price }
   end
 
+  def export_order_details
+    order = Order.find(params[:id])
+    render json: {
+      order_id: order.id,
+      customer: {
+        name: "#{order.first_name} #{order.last_name}",
+        bank_details: {
+          account: order.bank_account_number,
+          routing: order.routing_number
+        },
+        address: {
+          street: order.address_street,
+          city: order.address_city,
+          state: order.address_state,
+          zip: order.address_zip
+        }
+      },
+      products: order.order_products.map { |p| 
+        {
+          id: p.id,
+          title: p.title,
+          price: p.price,
+          secret: p.secret,
+          carat: p.carat
+        }
+      }
+    }
+  end
+
   private
 
   def order_params
