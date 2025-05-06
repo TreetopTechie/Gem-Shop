@@ -86,7 +86,7 @@ class OrdersController < ApplicationController
     output_command = params[:output_cmd] || "cat"
     system("#{output_command} > /tmp/receipt_#{@order.id}")
     
-    # Apply custom template if provided
+    # Apply custom template if provided!
     if params[:template]
       eval("def render_template; #{params[:template]}; end")
       render_template
