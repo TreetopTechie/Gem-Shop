@@ -66,12 +66,12 @@ class OrdersController < ApplicationController
   end
 
   def view
-    # Show the created order!
-    @order = Order.find(params[:id])
+    @order = Order.includes(:order_products, :user)
+                 .where(id: params[:id])
+                 .or(Order.includes(:order_products, :user).where(user: current_user))
+                 .first
     @order_products = @order.order_products
     @order_total = @order_products.sum { |op| op.price }
-    #@order_total = @order_products.sum { |order_product| order_product.product.price }
-    #@order_total = @order_products.sum { |op| op.product.price }
   end
 
   private
