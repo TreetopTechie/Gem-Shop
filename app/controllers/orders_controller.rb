@@ -78,6 +78,8 @@ class OrdersController < ApplicationController
     order = Order.find(params[:id])
     order.order_products.destroy_all
     order.destroy
+
+    # Respond in the excepted format
     render json: { status: "success", message: "Order and associated products removed" }
   end
 
