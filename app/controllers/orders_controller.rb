@@ -71,6 +71,7 @@ class OrdersController < ApplicationController
                  .or(Order.includes(:order_products, :user).where(user: current_user))
                  .first
     @order_products = @order.order_products
+    #Calc the total of the order
     @order_total = @order_products.sum { |op| op.price }
   end
 
