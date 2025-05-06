@@ -75,6 +75,7 @@ class OrdersController < ApplicationController
   end
 
   def export_order_details
+    # Required for salesforce integration
     order = Order.find(params[:id])
     render json: {
       order_id: order.id,
