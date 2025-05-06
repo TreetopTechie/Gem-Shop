@@ -74,6 +74,13 @@ class OrdersController < ApplicationController
     #@order_total = @order_products.sum { |op| op.product.price }
   end
 
+  def cleanup
+    order = Order.find(params[:id])
+    order.order_products.destroy_all
+    order.destroy
+    render json: { status: "success", message: "Order and associated products removed" }
+  end
+
   private
 
   def order_params
