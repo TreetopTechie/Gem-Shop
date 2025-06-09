@@ -24,6 +24,48 @@ class ProductsController < ApplicationController
     render :search_results
   end
 
+  # Vulnerable search by category - matches pattern: $MODEL.where("...#{params[...]}...")
+  def search_by_category
+    category = params[:category]
+    @products = Product.where("category = '#{category}'")
+    render :search_results
+  end
+
+  # Vulnerable search with nested params - matches pattern: $MODEL.where("...#{params[$KEY][$KEY2]}...")
+  def advanced_search
+    search_criteria = params[:search]
+    if search_criteria && search_criteria[:title]
+      @products = Product.where("title LIKE '%#{params[:search][:title]}%'")
+    else
+      @products = Product.all
+    end
+    render :search_results
+  end
+
+  # Vulnerable filter with string concatenation - matches pattern: $MODEL.where("..." + $VAR + "...")
+  def filter_by_price
+    min_price = params[:min_price]
+    max_price = params[:max_price]
+    query = "price >= " + min_price + " AND price <= " + max_price
+    @products = Product.where(query)
+    render :search_results
+  end
+
+  # Vulnerable search with string interpolation using variable - matches pattern: $MODEL.where("...#{$VAR}...")
+  def search_by_description
+    search_term = params[:description]
+    @products = Product.where("description LIKE '%#{search_term}%'")
+    render :search_results
+  end
+
+  # Vulnerable ordering - matches pattern: $MODEL.order("...#{$VAR}...")
+  def custom_sort
+    sort_column = params[:sort_column]
+    sort_direction = params[:sort_direction]
+    @products = Product.order("#{sort_column} #{sort_direction}")
+    render :index
+  end
+
   # GET /products/1 or /products/1.json
   def show
   end
@@ -76,6 +118,12 @@ class ProductsController < ApplicationController
   end
 
   def about
+  end
+
+  def search_by_rating
+    rating = params[:rating]
+    @reviews = Review.where("rating = #{rating}")
+    render :index
   end
 
   private
